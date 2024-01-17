@@ -6,6 +6,7 @@ import { fetchRoomApi } from "../../api/game.api";
 import io from "socket.io-client";
 import ConfettiComponent from "../confetti/confetti";
 
+
 const socket = io("http://localhost:5001");
 
 const CustomRoom = () => {
@@ -31,6 +32,10 @@ const CustomRoom = () => {
   }, []);
 
   useEffect(() => {
+
+    socket.connect('connect', () => {
+      console.log("connected")
+    })
     const fetchGameData = async () => {
       if (isMounted.current) {
         isMounted.current = false;
@@ -46,6 +51,7 @@ const CustomRoom = () => {
     fetchGameData();
   }, [roomCode]);
 
+  // console.log({game: userGame.game})
   useEffect(() => {
     socket.on("recieveGameData", (updatedGameData) => {
       setUserGame( (prev) =>( {...prev,

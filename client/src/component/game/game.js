@@ -9,7 +9,7 @@ const socket = io("http://localhost:5001");
 
 const Game = ({ setUserGame, roomCode, userGame }) => {
   const isMounted = useRef(true);
-
+  const [recivedSocketData, setRecievedSocketData] = useState(false);
   const checkUpdate = () => {
     const winnerFound = checkWin();
     if (winnerFound) {
@@ -21,34 +21,43 @@ const Game = ({ setUserGame, roomCode, userGame }) => {
     checkTie();
     updateGameData();
   };
-
+  console.log({ recivedSocketData });
   useEffect(() => {
-    if (isMounted.current) {
-      isMounted.current = false;
-      return;
-    }
-    const winnerFound = checkWin();
-    if (winnerFound) {
-      console.log("winner found");
-      updateGameData();
-      return;
-    }
+    function update() {
+      // if (isMounted.current) {
+      //   isMounted.current = false;
+      //   return;
+      // }
+      if (recivedSocketData) {
+        const winnerFound = checkWin();
+        if (winnerFound) {
+          console.log("winner found");
+          updateGameData();
+          return;
+        }
 
-    checkTie();
-    updateGameData();
-    console.log("Api called");
+        checkTie();
+        updateGameData();
+        console.log("Api called");
+      }
+    }
+    update();
   }, [userGame?.game?.board]);
 
   useEffect(() => {
     const handleReceiveUpdateGameData = (updatedGameData) => {
-      console.log(updatedGameData);
-      // setUserGame((...prev) => ({ ...prev, game: updatedGameData }));
+      console.log({ updatedGameData });
+      if (recivedSocketData) {
+        setUserGame((...prev) => ({ ...prev, game: updatedGameData }));
+        setRecievedSocketData(!recivedSocketData);
+      }
     };
 
     socket.on("recieveUpdateGameData", handleReceiveUpdateGameData);
 
     return () => {
       socket.off("recieveUpdateGameData", handleReceiveUpdateGameData);
+      // socket.disconnect();
     };
   }, [socket]);
 
@@ -152,7 +161,7 @@ const Game = ({ setUserGame, roomCode, userGame }) => {
           user={userGame?.user}
           chooseSquare={() => chooseSquare(0)}
           value={userGame?.game?.board[0]}
-          checkUpdate={checkUpdate}
+          apiCalled={setRecievedSocketData}
         />
         <Square
           turn={userGame?.game?.turn}
@@ -160,7 +169,7 @@ const Game = ({ setUserGame, roomCode, userGame }) => {
           user={userGame?.user}
           chooseSquare={() => chooseSquare(1)}
           value={userGame?.game?.board[1]}
-          checkUpdate={checkUpdate}
+          apiCalled={setRecievedSocketData}
         />
         <Square
           turn={userGame?.game?.turn}
@@ -168,7 +177,7 @@ const Game = ({ setUserGame, roomCode, userGame }) => {
           user={userGame?.game?.user}
           chooseSquare={() => chooseSquare(2)}
           value={userGame?.game?.board[2]}
-          checkUpdate={checkUpdate}
+          apiCalled={setRecievedSocketData}
         />
       </div>
       <div className="rows">
@@ -178,7 +187,7 @@ const Game = ({ setUserGame, roomCode, userGame }) => {
           user={userGame?.user}
           chooseSquare={() => chooseSquare(3)}
           value={userGame?.game?.board[3]}
-          checkUpdate={checkUpdate}
+          apiCalled={setRecievedSocketData}
         />
         <Square
           turn={userGame?.game?.turn}
@@ -186,7 +195,7 @@ const Game = ({ setUserGame, roomCode, userGame }) => {
           user={userGame?.user}
           chooseSquare={() => chooseSquare(4)}
           value={userGame?.game?.board[4]}
-          checkUpdate={checkUpdate}
+          apiCalled={setRecievedSocketData}
         />
         <Square
           turn={userGame?.game?.turn}
@@ -194,7 +203,7 @@ const Game = ({ setUserGame, roomCode, userGame }) => {
           user={userGame?.user}
           chooseSquare={() => chooseSquare(5)}
           value={userGame?.game?.board[5]}
-          checkUpdate={checkUpdate}
+          apiCalled={setRecievedSocketData}
         />
       </div>
       <div className="rows">
@@ -204,7 +213,7 @@ const Game = ({ setUserGame, roomCode, userGame }) => {
           user={userGame?.user}
           chooseSquare={() => chooseSquare(6)}
           value={userGame?.game?.board[6]}
-          checkUpdate={checkUpdate}
+          apiCalled={setRecievedSocketData}
         />
         <Square
           turn={userGame?.game?.turn}
@@ -212,7 +221,7 @@ const Game = ({ setUserGame, roomCode, userGame }) => {
           user={userGame?.user}
           chooseSquare={() => chooseSquare(7)}
           value={userGame?.game?.board[7]}
-          checkUpdate={checkUpdate}
+          apiCalled={setRecievedSocketData}
         />
         <Square
           turn={userGame?.game?.turn}
@@ -220,7 +229,7 @@ const Game = ({ setUserGame, roomCode, userGame }) => {
           user={userGame?.user}
           chooseSquare={() => chooseSquare(8)}
           value={userGame?.game?.board[8]}
-          checkUpdate={checkUpdate}
+          apiCalled={setRecievedSocketData}
         />
       </div>
     </div>
